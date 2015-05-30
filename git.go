@@ -20,9 +20,13 @@ func (g *Git) BackToThePast() error {
 	}
 	g.branch = strings.Trim(string(current), "\n")
 
-	return exec.Command("git", "checkout", "HEAD~").Run()
+	return g.co("HEAD~")
 }
 
 func (g *Git) BackToTheFuture() error {
-	return exec.Command("git", "checkout", g.branch).Run()
+	return g.co(g.branch)
+}
+
+func (_ *Git) co(to string) error {
+	return exec.Command("git", "checkout", to).Run()
 }
