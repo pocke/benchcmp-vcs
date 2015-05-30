@@ -3,22 +3,29 @@ package main
 import (
 	"io"
 	"io/ioutil"
-	"strings"
-)
-import (
 	"os"
 	"os/exec"
+	"strings"
+)
+
+const (
+	GO = "go"
 )
 
 func main() {
-	before, err := ioutil.TempFile("", "benchcmp-git")
+	before, beforeClose, err := Tempfile()
 	if err != nil {
 		panic(err)
 	}
-	defer before.Close()
-	defer os.Remove(before.Name())
+	defer beforeClose()
 
-	err = ExecBench(before)
+	after, afterClose, err := Tempfile()
+	if err != nil {
+		panic(err)
+	}
+	defer afterClose()
+
+	err = ExecBench(after)
 	if err != nil {
 		panic(err)
 	}
@@ -35,14 +42,7 @@ func main() {
 		c.Run()
 	}(current)
 
-	after, err := ioutil.TempFile("", "benchcmp-git")
-	if err != nil {
-		panic(err)
-	}
-	defer after.Close()
-	defer os.Remove(after.Name())
-
-	err = ExecBench(after)
+	err = ExecBench(before)
 	if err != nil {
 		panic(err)
 	}
@@ -53,9 +53,18 @@ func main() {
 	}
 }
 
-const (
-	GO = "go"
-)
+func Tempfile() (*os.File, func(), error) {
+	file, err := ioutil.TempFile("", "benchcmp-git")
+	if err != nil {
+		return nil, nil, err
+	}
+	fn := func() {
+		file.Close()
+		os.Remove(file.Name())
+	}
+
+	return file, fn, nil
+}
 
 func ExecBench(w io.Writer, opts ...string) error {
 	o := append([]string{"test", "-run=NONE", "-bench=.", "-benchmem"}, opts...)
