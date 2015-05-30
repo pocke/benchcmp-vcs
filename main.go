@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strings"
 )
 
 const (
@@ -25,22 +24,18 @@ func main() {
 	}
 	defer afterClose()
 
+	git := NewGit()
+
 	err = ExecBench(after)
 	if err != nil {
 		panic(err)
 	}
 
-	current, err := exec.Command("git", "name-rev", "--name-only", "HEAD").Output()
+	err = git.BackToThePast()
 	if err != nil {
 		panic(err)
 	}
-
-	exec.Command("git", "checkout", "HEAD~").Run()
-	defer func(branch []byte) {
-		b := strings.Trim(string(branch), "\n")
-		c := exec.Command("git", "checkout", b)
-		c.Run()
-	}(current)
+	defer git.BackToTheFuture()
 
 	err = ExecBench(before)
 	if err != nil {
