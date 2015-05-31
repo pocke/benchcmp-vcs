@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -41,6 +42,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Printf("old revision: %s\n", git.OldRevision())
+	if rev := git.NewRevision(); rev != "" {
+		fmt.Printf("new revision: %s\n", rev)
+	}
+	fmt.Println()
 
 	err = ExecCmp(os.Stdout, before.Name(), after.Name())
 	if err != nil {

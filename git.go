@@ -18,6 +18,9 @@ type Git struct {
 	// For BackToTheFuture method when use checkout.
 	now string
 
+	// revision hash for show revision.
+	old, new string
+
 	method gitMethod
 }
 
@@ -32,14 +35,20 @@ func NewGit() *Git {
 }
 
 func (g *Git) BackToThePast() error {
+	g.new = g.getRevision()
+
+	var err error
 	switch g.method {
 	case methodCheckout:
-		return g.checkoutPast()
+		err = g.checkoutPast()
 	case methodStash:
-		return g.stash()
+		err = g.stash()
 	default:
-		return fmt.Errorf("unexpected method")
+		err = fmt.Errorf("unexpected method")
 	}
+
+	g.old = g.getRevision()
+	return err
 }
 
 func (g *Git) BackToTheFuture() error {
@@ -53,12 +62,28 @@ func (g *Git) BackToTheFuture() error {
 	}
 }
 
+func (g *Git) NewRevision() string {
+	if g.method != methodCheckout {
+		return ""
+	}
+	return g.new
+}
+
+func (g *Git) OldRevision() string {
+	return g.old
+}
+
 // co is git checkout
 func (_ *Git) co(to string) error { return exec.Command("git", "checkout", to).Run() }
 
 func (_ *Git) hasChange() bool {
 	out, _ := exec.Command("git", "status", "--short").Output()
 	return len(out) != 0
+}
+
+func (_ *Git) getRevision() string {
+	out, _ := exec.Command("git", "rev-parse", "HEAD").Output()
+	return strings.Trim(string(out), "\n")
 }
 
 func (g *Git) checkoutPast() error {
