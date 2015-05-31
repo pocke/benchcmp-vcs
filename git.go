@@ -27,6 +27,12 @@ func (g *Git) BackToTheFuture() error {
 	return g.co(g.branch)
 }
 
+// co is git checkout
 func (_ *Git) co(to string) error {
 	return exec.Command("git", "checkout", to).Run()
+}
+
+func (_ *Git) hasChange() bool {
+	out, _ := exec.Command("git", "status", "--short").Output()
+	return len(out) != 0
 }
