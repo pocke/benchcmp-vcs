@@ -56,7 +56,7 @@ func main() {
 }
 
 func Tempfile() (*os.File, func(), error) {
-	file, err := ioutil.TempFile("", "benchcmp-git")
+	file, err := ioutil.TempFile("", "benchcmp-vcs")
 	if err != nil {
 		return nil, nil, err
 	}

@@ -14,7 +14,7 @@ const (
 )
 
 type Git struct {
-	// Branch before benchcmp-git command run.
+	// Branch before benchcmp-vcs command run.
 	// For BackToTheFuture method when use checkout.
 	now string
 
