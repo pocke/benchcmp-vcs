@@ -42,9 +42,9 @@ Why should use benchcmp-vcs?
 
 ```sh
 $ go test -run=NONE -bench=. -benchmem > new.txt
-$ git co HEAD~
+$ git checkout HEAD~
 $ go test -run=NONE -bench=. -benchmem > old.txt
-$ go co master
+$ go checkout master
 $ benchcmp old.txt new.txt
 $ rm old.txt new.txt
 ```
