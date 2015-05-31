@@ -36,3 +36,6 @@ func (_ *Git) hasChange() bool {
 	out, _ := exec.Command("git", "status", "--short").Output()
 	return len(out) != 0
 }
+
+func (_ *Git) stash() error        { return exec.Command("git", "stash", "save", "--include-untracked").Run() }
+func (_ *Git) recoverStash() error { return exec.Command("git", "stash", "pop").Run() }
