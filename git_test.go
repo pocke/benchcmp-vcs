@@ -40,33 +40,6 @@ func TestNewGit(t *testing.T) {
 	}()
 }
 
-func TestStash(t *testing.T) {
-	fn, err := takeGitDir()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer fn()
-
-	exec.Command("touch", "hoge").Run()
-
-	git := NewGit()
-	err = git.stash()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if git.hasChange() {
-		t.Error("Expected: no changes, but got some changes")
-	}
-
-	err = git.recoverStash()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !git.hasChange() {
-		t.Error("Expected: some changes, but got no changes")
-	}
-}
-
 // test helper
 func takeGitDir() (func(), error) {
 	dir, err := ioutil.TempDir("", "benchcmp-vcs-test")
